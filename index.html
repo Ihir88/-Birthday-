@@ -265,7 +265,6 @@
                         <label class="block text-[10px] font-semibold text-neutral-700 uppercase tracking-wider mb-2">Завантажте фото або знімок з телефону</label>
                         <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
                         <button onclick="document.getElementById('photoInput').click()" class="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase rounded-xl transition duration-300 flex items-center justify-center gap-2 shadow-md">
-                            <i class="fa-solid fa-camera"></i>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Обрати та додати фото
                         </button>
@@ -290,7 +289,7 @@
                 </div>
 
                 <!-- Сітка фото/відео галереї -->
-                <div id="galleryGrid" class="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+                <div id="galleryGrid" class="grid grid-cols-2 gap-3 max-h-[480px] overflow-y-auto pr-1">
                     <!-- Фотографії завантажуються сюди -->
                 </div>
             </div>
@@ -418,9 +417,17 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let lastUploadedFile = null; // Для дублювання на Google Диск
+        let lastUploadedFile = null;
 
-        // 1. АВТОРИЗАЦІЯ ( RULE 3 - Auth Before Queries )
+        // Ваші реальні фотографії, додані безпосередньо у вихідний код за замовчуванням
+        const DEFAULT_PHOTOS = [
+            { id: "photo1", url: "https://i.postimg.cc/34f804xL/IMG-20260519-102058-594.jpg", createdAt: 1779180058000 },
+            { id: "photo2", url: "https://i.postimg.cc/5YK4QY27/IMG-20260519-102058-721.jpg", createdAt: 1779180058100 },
+            { id: "photo3", url: "https://i.postimg.cc/hzZDQztZ/IMG-20260519-102059-072.jpg", createdAt: 1779180059000 },
+            { id: "photo4", url: "https://i.postimg.cc/R6pSJ6Zd/IMG-20260519-102059-324.jpg", createdAt: 1779180059200 }
+        ];
+
+        // 1. АВТОРИЗАЦІЯ ( RULE 3 - спочатку авторизуємось, потім робимо запити )
         async function initAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -430,7 +437,6 @@
                 }
             } catch (error) {
                 console.error("Помилка авторизації:", error);
-                // Навіть без хмари, запускаємо локальний режим роботи галереї
                 renderGallery();
             }
         }
@@ -446,7 +452,7 @@
 
         initAuth();
 
-        // 2. СЛУХАЧ ХМАРИ ( RULE 2 - Без compound queries )
+        // 2. СЛУХАЧ ХМАРИ ( RULE 2 - без складних фільтрацій та сортувань в запиті )
         let cloudPhotos = [];
         function setupCloudGalleryListener() {
             if (!currentUser) return;
@@ -463,22 +469,22 @@
                     });
                 });
 
-                // Сортування на клієнті
+                // Сортування результатів на боці клієнта
                 cloudPhotos.sort((a, b) => b.createdAt - a.createdAt);
                 renderGallery();
             }, (error) => {
-                console.error("Помилка отримання даних з хмари:", error);
-                renderGallery(); // Фоллбек на локальні за будь-якої помилки
+                console.error("Помилка синхронізації з хмарою:", error);
+                renderGallery();
             });
         }
 
-        // 3. СИНХРОНІЗАЦІЯ ТА ВІДОБРАЖЕННЯ ГАЛЕРЕЇ
-        window.loadedPhotos = []; // Глобальний список для ZIP
+        // 3. РЕНДЕРИНГ ГАЛЕРЕЇ (Об'єднання хмари, локальних фото та нових дефолтних фотографій)
+        window.loadedPhotos = [];
         function renderGallery() {
             const galleryGrid = document.getElementById('galleryGrid');
             galleryGrid.innerHTML = '';
 
-            // Завантажуємо локально збережені фото
+            // Отримуємо локальні фото
             let localPhotos = [];
             try {
                 localPhotos = JSON.parse(localStorage.getItem(`ihor_local_photos_${appId}`)) || [];
@@ -486,36 +492,24 @@
                 localPhotos = [];
             }
 
-            // Об'єднуємо хмарні та локальні фото, видаляючи можливі дублікати за URL
-            const merged = [...localPhotos, ...cloudPhotos];
+            // Об'єднуємо всі наявні джерела (Локальні + Хмара)
+            const activeUserPhotos = [...localPhotos, ...cloudPhotos];
+            
+            // Якщо користувачі ще не завантажили власні фотографії, відображаємо завантажені вами 4 чудові дефолтні фото
+            const finalPhotosList = activeUserPhotos.length > 0 ? activeUserPhotos : DEFAULT_PHOTOS;
+
+            // Видаляємо дублікати за URL адресою
             const uniquePhotos = [];
             const seenUrls = new Set();
-
-            merged.forEach(p => {
+            finalPhotosList.forEach(p => {
                 if (!seenUrls.has(p.url)) {
                     seenUrls.add(p.url);
                     uniquePhotos.push(p);
                 }
             });
 
-            // Оновлюємо глобальну чергу для ZIP скачування
             window.loadedPhotos = uniquePhotos;
 
-            if (uniquePhotos.length === 0) {
-                galleryGrid.innerHTML = `
-                    <div id="emptyGallery" class="col-span-2 text-center py-8 text-xs text-neutral-400">
-                        Альбом поки що порожній. Будьте першими, хто додасть яскраве фото чи відео!
-                    </div>
-                `;
-                document.getElementById('downloadAllBtn').disabled = true;
-                document.getElementById('downloadAllBtn').classList.add('opacity-50');
-                return;
-            } else {
-                document.getElementById('downloadAllBtn').disabled = false;
-                document.getElementById('downloadAllBtn').classList.remove('opacity-50');
-            }
-
-            // Відображаємо елементи в сітці
             uniquePhotos.forEach((item) => {
                 const mediaCard = document.createElement('div');
                 mediaCard.className = 'media-card relative aspect-square rounded-xl overflow-hidden border border-pink-100 shadow-sm group bg-neutral-100 cursor-pointer transition transform hover:scale-[1.02]';
@@ -534,7 +528,7 @@
                         <img src="${item.url}" alt="Фото свята" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2 gap-1.5 z-10">
                             <button onclick="openLightbox('${item.url}', event)" class="w-full py-1.5 bg-white/95 text-pink-600 text-[10px] font-bold uppercase rounded-lg hover:bg-white transition">Подивитися</button>
-                            <a href="${item.url}" download="photo_${item.id || 'local'}.jpg" onclick="event.stopPropagation()" class="w-full py-1.5 bg-pink-500/90 text-white text-[10px] font-bold uppercase rounded-lg hover:bg-pink-500 transition text-center flex items-center justify-center gap-1">
+                            <a href="${item.url}" download="photo_${item.id || 'photo'}.jpg" onclick="event.stopPropagation()" class="w-full py-1.5 bg-pink-500/90 text-white text-[10px] font-bold uppercase rounded-lg hover:bg-pink-500 transition text-center flex items-center justify-center gap-1">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 Скачати
                             </a>
@@ -545,14 +539,17 @@
 
                 galleryGrid.appendChild(mediaCard);
             });
+
+            document.getElementById('downloadAllBtn').disabled = false;
+            document.getElementById('downloadAllBtn').classList.remove('opacity-50');
         }
 
-        // 4. ДОДАВАННЯ ТА ОБРОБКА ФОТО
+        // 4. ЗАВАНТАЖЕННЯ НОВИХ ФОТО
         window.handlePhotoUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            lastUploadedFile = file; // зберігаємо файл для прямої передачі на Диск
+            lastUploadedFile = file;
             const progress = document.getElementById('uploadProgress');
             progress.classList.remove('hidden');
 
@@ -563,7 +560,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const max_size = 800; // Оптимальний розмір для швидкого завантаження
+                    const max_size = 800;
 
                     if (width > height) {
                         if (width > max_size) {
@@ -584,10 +581,9 @@
 
                     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.82);
 
-                    // МИТТЄВО додаємо в локальний список, щоб гість ОДРАЗУ побачив фото на екрані
+                    // Зберігаємо локально для миттєвого рендерингу на екрані
                     savePhotoLocally(compressedBase64);
-                    
-                    // Відправляємо в Firestore хмару паралельно
+                    // Відправляємо в базу Firestore
                     savePhotoToCloud(compressedBase64);
                 };
                 img.src = e.target.result;
@@ -595,7 +591,6 @@
             reader.readAsDataURL(file);
         };
 
-        // Локальне збереження для миттєвого рендерингу
         function savePhotoLocally(base64Data) {
             let localPhotos = [];
             try {
@@ -610,19 +605,16 @@
                 createdAt: Date.now()
             });
 
-            // Зберігаємо останні 10 локальних знімків для надійності
-            if (localPhotos.length > 10) {
-                localPhotos = localPhotos.slice(0, 10);
+            if (localPhotos.length > 15) {
+                localPhotos = localPhotos.slice(0, 15);
             }
 
             localStorage.setItem(`ihor_local_photos_${appId}`, JSON.stringify(localPhotos));
-            renderGallery(); // Миттєве оновлення екрану!
+            renderGallery();
         }
 
-        // Завантаження у хмару Firestore
         async function savePhotoToCloud(base64Data) {
             if (!currentUser) {
-                // Якщо немає коннекту з auth, просто показуємо вікно Google Drive
                 document.getElementById('uploadProgress').classList.add('hidden');
                 showDrivePrompt();
                 return;
@@ -637,16 +629,15 @@
                     addedBy: currentUser.uid
                 });
                 
-                showToast("Фото успішно опубліковано на сайті! 🎉");
+                showToast("Фото опубліковано в галереї сайту! 🎉");
             } catch (error) {
-                console.error("Помилка завантаження у Firestore:", error);
+                console.error("Помилка відправки у Firestore:", error);
             } finally {
                 document.getElementById('uploadProgress').classList.add('hidden');
-                showDrivePrompt(); // Пропонуємо продублювати оригінал на Диск
+                showDrivePrompt();
             }
         }
 
-        // Обробка посилання
         window.addMediaUrl = function(event) {
             event.preventDefault();
             const mediaUrlInput = document.getElementById('mediaUrl');
@@ -662,11 +653,9 @@
             mediaUrlInput.value = '';
         };
 
-        // Функція переходу на диск з можливістю завантаження файлу
         window.saveDirectlyToDrive = function() {
             if (lastUploadedFile) {
-                // Якщо є файл, готуємо скачування його копії або відкриваємо папку
-                showToast("Відкриваємо Google Диск. Будь ласка, перетягніть туди ваше фото!");
+                showToast("Спільну папку відкрито. Будь ласка, завантажте туди ваше фото!");
             }
             window.open("https://drive.google.com/drive/folders/1OR-vlXvLNQ0wUB0xIAOFE6lzpbQOLgpd", "_blank");
             closeDrivePrompt();
@@ -864,11 +853,9 @@
                     const item = window.loadedPhotos[i];
                     let blob;
                     if (item.url.startsWith('data:image')) {
-                        // Конвертуємо локальний Base64 назад у Blob
                         const res = await fetch(item.url);
                         blob = await res.blob();
                     } else {
-                        // Скачуємо за посиланням
                         const res = await fetch(item.url);
                         blob = await res.blob();
                     }
@@ -902,6 +889,5 @@
     </script>
 </body>
 </html>
-
 
 
