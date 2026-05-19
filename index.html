@@ -11,11 +11,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Бібліотека для створення ZIP-архівів прямо в браузері -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #fff6f8;
-            /* Встановлення вашого зображення як фону всієї сторінки */
+            /* Встановлення зображення як фону всієї сторінки */
             background-image: url('https://i.postimg.cc/MKpbg5Hf/Pink-Cute-Girly-Birthday-Invitation-kopia.png');
             background-size: cover;
             background-position: center;
@@ -89,9 +92,9 @@
             transform: translateY(0);
         }
 
-        /* Стильна напівпрозора картка */
+        /* Напівпрозора картка */
         .rsvp-card {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 182, 193, 0.4);
         }
@@ -99,23 +102,22 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between py-8 px-4 relative">
 
-    <!-- Святковий аудіосупровід -->
+    <!-- Аудіоелемент для фонової музики (Imagine Dragons — Believer) -->
     <audio id="bgMusic" loop preload="auto">
-        <source src="https://pisnya.com/index.php?do=download&id=5076" type="audio/mpeg">
+        <source src="https://rapid.spotidown.app/v2?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaWxlbmFtZSI6IkJlbGlldmVyIC0gSW1hZ2luZSBEcmFnb25zIiwiaWF0IjoxNzc5MTcyMzUyLCJleHAiOjE3NzkxNzU5NTIsInVybCI6Ik5sQk5SRFo2TjBKU1ZrVnpWRU5CUkZJdlZuWllTRUZ3V1ZWTFRuRlpaWGt6VXpKQk5TdDRkV3hSV0RSa2EwOURWV0lyUldOSU1tUjJLemRDWm01MlVrZEJPRmhaY0dWT1NpdExhak0zWkVSRmVqQjBTV054ZG14VVkxQkZUR3d5U0ZSMksyeEJKeTlzUW1KeWJsTlVOelpMVUdKWk5GaDNXVEpKVWtkS1lqSktURUZDT0hKWU9VNHJWMWR4U2tSd09YaHljM3BOVVdwWVNIcHVjbWRpTW1WNmNqTXhWM0I0VWtaM2FHSldlVkpYVTB0TWNtUkZZbGhVY1hobGMzRkVPVlpJZFVzM01HNXNOSE15ZGtoblMwOTRkMlZSU1hOUFVqRumVV2d3UTJrNVdIaE1XRkE1TDNkamRWVnpXbGhtZFdSRVYzZGhSelI0WWxSeVNuQkhNVWR2YmpFdlNYTTNiRmhDYXpCVFVEWXdVME5DTHpsaFVWbEVcounter" type="audio/mpeg">
     </audio>
 
-    <!-- Екран-конверт для обходу блокування автоплею звуку в браузерах -->
-    <div id="welcomeOverlay" class="fixed inset-0 bg-pink-50/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 transition-all duration-700">
+    <!-- Екран-конверт для запуску звуку -->
+    <div id="welcomeOverlay" class="fixed inset-0 bg-pink-50/95 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 transition-all duration-700">
         <div class="bg-white/95 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-pink-200 flex flex-col items-center gap-6">
             <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center animate-bounce">
-                <!-- Іконка конверта з серцем -->
                 <svg class="w-10 h-10 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9z" clip-rule="evenodd" />
                 </svg>
             </div>
             <div>
-                <h2 class="text-xl font-serif-custom text-neutral-800 font-bold uppercase tracking-wider mb-2">Вам надіслано лист!</h2>
-                <p class="text-sm text-neutral-500">Натисніть кнопку нижче, щоб відкрити музичне запрошення</p>
+                <h2 class="text-xl font-serif-custom text-neutral-800 font-bold uppercase tracking-wider mb-2">Привіт, Вам лист!</h2>
+                <p class="text-sm text-neutral-500 font-medium">Відкрийте запрошення на день народження Ігоря та завантажуйте фотографії нашого свята!</p>
             </div>
             <button onclick="openInvitation(event)" class="w-full py-4 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm tracking-widest uppercase rounded-2xl shadow-lg shadow-pink-200 hover:scale-102 active:scale-98 transition duration-300">
                 Відкрити запрошення 💖
@@ -125,11 +127,9 @@
 
     <!-- Кнопка увімкнення/вимкнення музики -->
     <button id="musicToggle" class="fixed top-4 right-4 z-40 bg-white/90 backdrop-blur border border-pink-200 p-3.5 rounded-full shadow-lg hover:bg-pink-50 hover:scale-105 active:scale-95 transition-all duration-300">
-        <!-- Режим: Вимкнено -->
         <svg id="musicIconPlay" class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
         </svg>
-        <!-- Режим: Грає -->
         <svg id="musicIconPause" class="w-6 h-6 text-pink-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
         </svg>
@@ -147,37 +147,29 @@
                 <path d="M100 100 C140 50, 180 60, 175 100 C170 140, 130 120, 100 100 Z" fill="#f48fb1" opacity="0.9"/>
                 <path d="M100 100 C130 65, 160 70, 158 100 C155 125, 125 115, 100 100 Z" fill="#f06292" opacity="0.95"/>
                 <path d="M90 105 C70 130, 40 160, 50 175 C55 180, 70 165, 85 150 C95 140, 95 120, 90 105 Z" fill="#f48fb1"/>
-                <path d="M110 105 C130 130, 160 160, 150 175 C145 180, 130 165, 115 150 C105 140, 105 120, 110 105 Z" fill="#f48fb1"/>
                 <ellipse cx="100" cy="100" rx="14" ry="12" fill="#ec407a"/>
             </svg>
         </div>
 
-        <!-- Центральний верхній бантик -->
+        <!-- Central top bow -->
         <div class="absolute top-[-30px] left-1/2 transform -translate-x-1/2 w-28 sm:w-36 bow-element floating-element" style="animation-delay: 1.5s;" onclick="handleInteraction(event)">
             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M100 100 C60 50, 20 60, 25 100 C30 140, 70 120, 100 100 Z" fill="#f48fb1" opacity="0.9"/>
-                <path d="M100 100 C70 65, 40 70, 42 100 C45 125, 75 115, 100 100 Z" fill="#f06292" opacity="0.95"/>
                 <path d="M100 100 C140 50, 180 60, 175 100 C170 140, 130 120, 100 100 Z" fill="#f48fb1" opacity="0.9"/>
-                <path d="M100 100 C130 65, 160 70, 158 100 C155 125, 125 115, 100 100 Z" fill="#f06292" opacity="0.95"/>
-                <path d="M90 105 C70 130, 45 170, 55 180 C65 170, 80 155, 90 135 Z" fill="#f48fb1"/>
-                <path d="M110 105 C130 130, 155 170, 145 180 C135 170, 120 155, 110 135 Z" fill="#f48fb1"/>
                 <ellipse cx="100" cy="100" rx="14" ry="12" fill="#ec407a"/>
             </svg>
         </div>
 
-        <!-- Правий верхній бантик -->
+        <!-- Right top bow -->
         <div class="absolute top-[-20px] right-[-20px] w-28 sm:w-36 bow-element floating-element" style="animation-delay: 3s;" onclick="handleInteraction(event)">
             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="transform scale-x-[-1] rotate-[15deg]">
                 <path d="M100 100 C60 50, 20 60, 25 100 C30 140, 70 120, 100 100 Z" fill="#f48fb1" opacity="0.9"/>
                 <path d="M100 100 C140 50, 180 60, 175 100 C170 140, 130 120, 100 100 Z" fill="#f48fb1" opacity="0.9"/>
-                <path d="M90 105 C70 130, 40 160, 50 175 C55 180, 70 165, 85 150 Z" fill="#f48fb1"/>
-                <path d="M110 105 C130 130, 160 160, 150 175 C145 180, 130 165, 115 150 Z" fill="#f48fb1"/>
                 <ellipse cx="100" cy="100" rx="14" ry="12" fill="#ec407a"/>
             </svg>
         </div>
 
         <!-- ================= ДЕКОРАТИВНІ СЯЮЧІ ЕЛЕМЕНТИ ================= -->
-        <!-- Рожеві серця -->
         <div class="absolute right-12 top-1/4 w-8 h-8 pulsing-star opacity-70" style="animation-delay: 0.5s;">
             <svg viewBox="0 0 24 24" fill="#ffb6c1"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </div>
@@ -185,7 +177,6 @@
             <svg viewBox="0 0 24 24" fill="#ffb6c1"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </div>
 
-        <!-- Сяючі зірочки -->
         <div class="absolute left-8 top-[46%] w-10 h-10 pulsing-star" style="animation-delay: 0.3s;">
             <svg viewBox="0 0 100 100" fill="none"><path d="M50 0 C50 35, 35 50, 0 50 C35 50, 50 65, 50 100 C50 65, 65 50, 100 50 C65 50, 50 35, 50 0 Z" fill="#ff6097"/></svg>
         </div>
@@ -247,6 +238,63 @@
                 </div>
             </div>
 
+            <!-- ================= СПІЛЬНИЙ АЛЬБОМ СВЯТА (З ДУБЛЮВАННЯМ) ================= -->
+            <div class="mb-10 p-5 bg-white/95 rounded-2xl border border-pink-100 text-left reveal" id="inv-gallery-section">
+                <h3 class="text-base font-serif-custom text-neutral-800 uppercase tracking-widest font-bold mb-1 text-center">Альбом спогадів</h3>
+                <p class="text-xs text-neutral-500 text-center mb-4">Кожне додане фото миттєво з'явиться на сайті та продублюється у хмару!</p>
+
+                <!-- Головні кнопки взаємодії з диском та завантаженням -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    <!-- Завантажити все ZIP-архівом прямо на сайті -->
+                    <button id="downloadAllBtn" onclick="downloadAllPhotosAsZip()" class="w-full py-3 px-4 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold uppercase rounded-xl transition duration-300 flex items-center justify-center gap-2 shadow-md shadow-pink-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Завантажити все ZIP
+                    </button>
+
+                    <!-- Швидкий перехід на спільну папку Google Диску -->
+                    <a id="gDriveLink" href="https://drive.google.com/drive/folders/1OR-vlXvLNQ0wUB0xIAOFE6lzpbQOLgpd" target="_blank" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase rounded-xl transition duration-300 flex items-center justify-center gap-2 shadow-md shadow-blue-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
+                        Папка Google Диск
+                    </a>
+                </div>
+
+                <!-- Завантажувач медіафайлів -->
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-neutral-700 uppercase tracking-wider mb-2">Завантажте фото сюди (воно збережеться на сайті та запропонує дублювати на Google Диск)</label>
+                        <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                        <button onclick="document.getElementById('photoInput').click()" class="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase rounded-xl transition duration-300 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Додати нове фото
+                        </button>
+                    </div>
+
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-neutral-200"></div>
+                        <span class="flex-shrink mx-4 text-[10px] text-neutral-400 uppercase tracking-wider">Або вставте посилання</span>
+                        <div class="flex-grow border-t border-neutral-200"></div>
+                    </div>
+
+                    <!-- Форма для посилань (відео чи картинок) -->
+                    <form id="mediaForm" class="flex gap-2" onsubmit="addMediaUrl(event)">
+                        <input type="url" id="mediaUrl" placeholder="Посилання на YouTube, TikTok або Google Диск файл" class="flex-1 px-3 py-2 text-xs rounded-xl border border-pink-100 focus:outline-none bg-white">
+                        <button type="submit" class="px-4 py-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold uppercase rounded-xl transition duration-300">Додати</button>
+                    </form>
+                    
+                    <!-- Індикатор прогресу завантаження -->
+                    <div id="uploadProgress" class="hidden text-center py-2 text-xs font-semibold text-pink-600 animate-pulse">
+                        Зберігаємо у спільну галерею...
+                    </div>
+                </div>
+
+                <!-- Сітка фото/відео галереї -->
+                <div id="galleryGrid" class="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">
+                    <div id="emptyGallery" class="col-span-2 text-center py-8 text-xs text-neutral-400">
+                        Альбом поки що порожній. Будьте першими, хто додасть яскраве фото чи відео!
+                    </div>
+                </div>
+            </div>
+
             <!-- Швидкі дії -->
             <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-10 reveal" id="inv-actions">
                 <button onclick="copyAddress()" class="w-full sm:w-auto px-5 py-3 bg-pink-50 hover:bg-pink-100 text-pink-600 font-medium text-xs tracking-wider uppercase rounded-xl border border-pink-200 transition duration-300 flex items-center justify-center gap-2">
@@ -287,7 +335,6 @@
                     </button>
                 </form>
 
-                <!-- Повідомлення після надсилання -->
                 <div id="successMessage" class="hidden text-center py-6 space-y-2">
                     <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto text-pink-500">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -300,23 +347,329 @@
         </div>
     </div>
 
+    <!-- Модальне вікно пропозиції продублювати на Google Диск -->
+    <div id="drivePromptModal" class="fixed inset-0 bg-black/85 z-55 hidden flex-col items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border border-pink-200 flex flex-col items-center gap-5">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-neutral-800">Фото додано на сайт!</h3>
+                <p class="text-xs text-neutral-500 mt-1">Ми також рекомендуємо продублювати це фото у вашу спільну папку на Google Диску, щоб зберегти його в оригінальній якості.</p>
+            </div>
+            <div class="flex flex-col gap-2 w-full">
+                <a id="modalDriveLink" href="https://drive.google.com/drive/folders/1OR-vlXvLNQ0wUB0xIAOFE6lzpbQOLgpd" target="_blank" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase rounded-xl transition text-center">
+                    Перейти та додати на Диск
+                </a>
+                <button onclick="closeDrivePrompt()" class="w-full py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-xs font-bold uppercase rounded-xl transition">
+                    Пропустити
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Повноекранний перегляд (Lightbox) -->
+    <div id="lightbox" class="fixed inset-0 bg-black/95 z-50 hidden flex-col items-center justify-center p-4">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <img id="lightboxImg" class="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl" src="" alt="Перегляд фото">
+        <div class="flex gap-4 mt-6">
+            <a id="lightboxDownloadBtn" href="" download="birthday_photo.jpg" class="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition duration-300 flex items-center gap-2 shadow-lg shadow-pink-500/20">
+                Завантажити
+            </a>
+            <button onclick="closeLightbox()" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition duration-300">
+                Закрити
+            </button>
+        </div>
+    </div>
+
     <!-- Футер -->
     <footer class="mt-8 text-center text-neutral-400 text-[10px] uppercase tracking-widest z-10">
-        © 2026 День Народження Ігоря
+        © 2026 День Narodження Ігоря
     </footer>
 
-    <!-- Повідомлення про копіювання -->
-    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-neutral-900 text-white text-xs py-3 px-6 rounded-full shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+    <!-- Повідомлення про завантаження / копіювання -->
+    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-neutral-900 text-white text-xs py-3 px-6 rounded-full shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 text-center">
         Адресу скопійовано в буфер обміну!
     </div>
 
+    <!-- Firebase та інтерактивний скрипт -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ================= FIREBASE СИНХРОНІЗАЦІЯ =================
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "",
+            authDomain: "default-app-id.firebaseapp.com",
+            projectId: "default-app-id",
+            storageBucket: "default-app-id.appspot.com",
+            messagingSenderId: "12345",
+            appId: "1:12345:web:12345"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ihor-birthday-2026';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let loadedPhotos = [];
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const credentials = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = credentials.user;
+                } else {
+                    const credentials = await signInAnonymously(auth);
+                    currentUser = credentials.user;
+                }
+                setupCloudGalleryListener();
+            } catch (error) {
+                console.error("Помилка авторизації в хмарі:", error);
+            }
+        }
+
+        initAuth();
+
+        function setupCloudGalleryListener() {
+            if (!currentUser) return;
+
+            const galleryCollection = collection(db, 'artifacts', appId, 'public', 'data', 'gallery');
+
+            onSnapshot(galleryCollection, (snapshot) => {
+                const galleryGrid = document.getElementById('galleryGrid');
+                const emptyGallery = document.getElementById('emptyGallery');
+
+                const currentCards = galleryGrid.querySelectorAll('.media-card');
+                currentCards.forEach(card => card.remove());
+                loadedPhotos = [];
+
+                if (snapshot.empty) {
+                    emptyGallery.style.display = 'block';
+                    document.getElementById('downloadAllBtn').disabled = true;
+                    document.getElementById('downloadAllBtn').classList.add('opacity-50');
+                    return;
+                } else {
+                    emptyGallery.style.display = 'none';
+                    document.getElementById('downloadAllBtn').disabled = false;
+                    document.getElementById('downloadAllBtn').classList.remove('opacity-50');
+                }
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const mediaCard = document.createElement('div');
+                    mediaCard.className = 'media-card relative aspect-square rounded-xl overflow-hidden border border-pink-100 shadow-sm group bg-neutral-100 cursor-pointer';
+
+                    const isVideo = data.url.includes('youtube.com') || data.url.includes('youtu.be') || data.url.includes('tiktok.com');
+
+                    if (isVideo) {
+                        mediaCard.innerHTML = `
+                            <a href="${data.url}" target="_blank" class="w-full h-full flex flex-col items-center justify-center bg-neutral-900 text-white p-2 text-center">
+                                <svg class="w-8 h-8 text-pink-500 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/></svg>
+                                <span class="text-[9px] uppercase tracking-wider font-bold">Відео спогад</span>
+                            </a>
+                        `;
+                    } else {
+                        loadedPhotos.push({ id: doc.id, url: data.url });
+
+                        mediaCard.innerHTML = `
+                            <img src="${data.url}" alt="Фото свята" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2 gap-1.5 z-10">
+                                <button onclick="openLightbox('${data.url}', event)" class="w-full py-1.5 bg-white/95 text-pink-600 text-[10px] font-bold uppercase rounded-lg hover:bg-white transition">Подивитися</button>
+                                <a href="${data.url}" download="photo_${doc.id}.jpg" onclick="event.stopPropagation()" class="w-full py-1.5 bg-pink-500/90 text-white text-[10px] font-bold uppercase rounded-lg hover:bg-pink-500 transition text-center flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    Скачати
+                                </a>
+                            </div>
+                        `;
+                        mediaCard.onclick = () => openLightbox(data.url);
+                    }
+
+                    galleryGrid.appendChild(mediaCard);
+                });
+            }, (error) => {
+                console.error("Помилка синхронізації спогадів:", error);
+            });
+        }
+
+        window.downloadAllPhotosAsZip = async function() {
+            if (loadedPhotos.length === 0) {
+                showToast("Немає фото для скачування!");
+                return;
+            }
+
+            const downloadBtn = document.getElementById('downloadAllBtn');
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Архівуємо...
+            `;
+            downloadBtn.disabled = true;
+
+            try {
+                const zip = new JSZip();
+                for (let i = 0; i < loadedPhotos.length; i++) {
+                    const item = loadedPhotos[i];
+                    let blob;
+                    if (item.url.startsWith('data:image')) {
+                        const response = await fetch(item.url);
+                        blob = await response.blob();
+                    } else {
+                        const response = await fetch(item.url);
+                        blob = await response.blob();
+                    }
+                    zip.file(`birthday_photo_${item.id}.jpg`, blob);
+                }
+
+                const content = await zip.generateAsync({ type: "blob" });
+                const url = window.URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ігор_birthday_photos_all.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                showToast("Усі фото успішно запаковано у ZIP та скачано! 🎉");
+            } catch (error) {
+                console.error("Помилка при створенні ZIP-архіву:", error);
+                showToast("Не вдалося завантажити всі фото разом.");
+            } finally {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            }
+        };
+
+        window.handlePhotoUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file || !currentUser) return;
+
+            const progress = document.getElementById('uploadProgress');
+            progress.classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max_size = 820;
+
+                    if (width > height) {
+                        if (width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        }
+                    } else {
+                        if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    saveMediaToCloud(compressedBase64, true);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.addMediaUrl = function(event) {
+            event.preventDefault();
+            const mediaUrlInput = document.getElementById('mediaUrl');
+            const url = mediaUrlInput.value.trim();
+
+            if (!url || !currentUser) return;
+
+            const progress = document.getElementById('uploadProgress');
+            progress.classList.remove('hidden');
+
+            saveMediaToCloud(url, false);
+            mediaUrlInput.value = '';
+        };
+
+        async function saveMediaToCloud(urlValue, suggestDrive = false) {
+            try {
+                const galleryCollection = collection(db, 'artifacts', appId, 'public', 'data', 'gallery');
+                await addDoc(galleryCollection, {
+                    url: urlValue,
+                    createdAt: serverTimestamp(),
+                    addedBy: currentUser.uid
+                });
+
+                if (suggestDrive) {
+                    showDrivePrompt();
+                }
+            } catch (error) {
+                console.error("Не вдалося завантажити медіафайл:", error);
+            } finally {
+                document.getElementById('uploadProgress').classList.add('hidden');
+            }
+        }
+    </script>
+
+    <!-- Інтерактивні скрипти інтерфейсу та Lightbox -->
     <script>
-        // Керування фоновою музикою
-        const musicToggle = document.getElementById('musicToggle');
         const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.getElementById('musicToggle');
         const playIcon = document.getElementById('musicIconPlay');
         const pauseIcon = document.getElementById('musicIconPause');
         let isPlaying = false;
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.style.opacity = "1";
+            setTimeout(() => toast.style.opacity = "0", 3500);
+        }
+
+        // Показ модального вікна пропозиції завантажити на Google Диск
+        function showDrivePrompt() {
+            const modal = document.getElementById('drivePromptModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDrivePrompt() {
+            const modal = document.getElementById('drivePromptModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Повноекранний перегляд (Lightbox)
+        function openLightbox(url, event) {
+            if (event) event.stopPropagation();
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            const lightboxDownloadBtn = document.getElementById('lightboxDownloadBtn');
+
+            lightboxImg.src = url;
+            lightboxDownloadBtn.href = url;
+            lightboxDownloadBtn.setAttribute('download', 'ігор_birthday_photo.jpg');
+
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('flex');
+            lightbox.classList.add('hidden');
+        }
 
         function toggleMusic() {
             if (isPlaying) {
@@ -328,43 +681,35 @@
                     playIcon.classList.add('hidden');
                     pauseIcon.classList.remove('hidden');
                 }).catch(error => {
-                    console.log("Програвання заблоковано налаштуваннями браузера або помилкою завантаження файлу");
+                    console.log("Програвання заблоковано налаштуваннями браузера");
                 });
-                playIcon.classList.add('hidden');
-                pauseIcon.classList.remove('hidden');
             }
             isPlaying = !isPlaying;
         }
 
         musicToggle.addEventListener('click', toggleMusic);
 
-        // Відкриття листа та активація музики
         function openInvitation(event) {
-            // Створюємо іскорки в центрі екрану
             createSparkles(event);
             
-            // Запускаємо музику
             bgMusic.play().then(() => {
                 isPlaying = true;
                 playIcon.classList.add('hidden');
                 pauseIcon.classList.remove('hidden');
             }).catch(e => {
-                console.log("Музика очікує додаткової взаємодії");
+                console.log("Очікування взаємодії користувача");
             });
 
-            // Ховаємо вітальне віконце
             const overlay = document.getElementById('welcomeOverlay');
             overlay.style.opacity = '0';
             setTimeout(() => {
                 overlay.style.display = 'none';
             }, 700);
 
-            // Показуємо та анімуємо основну карту
             const mainCard = document.getElementById('mainCard');
             mainCard.classList.remove('opacity-0');
             
-            // Запускаємо анімації появи контенту
-            const reveals = ['inv-subtitle', 'inv-name', 'inv-title', 'inv-party', 'inv-details', 'inv-countdown', 'inv-actions', 'inv-rsvp'];
+            const reveals = ['inv-subtitle', 'inv-name', 'inv-title', 'inv-party', 'inv-gallery-section', 'inv-details', 'inv-countdown', 'inv-actions', 'inv-rsvp'];
             reveals.forEach((id, index) => {
                 setTimeout(() => {
                     const el = document.getElementById(id);
@@ -373,7 +718,6 @@
             });
         }
 
-        // Клік по бантиках активує музику (якщо вона була зупинена) та іскорки
         function handleInteraction(event) {
             createSparkles(event);
             if (!isPlaying) {
@@ -381,7 +725,6 @@
             }
         }
 
-        // Таймер зворотного відліку до 23 травня 2026 о 10:00
         const targetDate = new Date("May 23, 2026 10:00:00").getTime();
 
         function updateCountdown() {
@@ -406,7 +749,6 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // Створення анімованих іскорок навколо кліку
         function createSparkles(event) {
             const numSparkles = 8;
             const colors = ['#f48fb1', '#f06292', '#ffb6c1', '#fff'];
@@ -418,7 +760,6 @@
                 sparkle.style.width = `${size}px`;
                 sparkle.style.height = `${size}px`;
                 
-                // Якщо подія викликана кодом, беремо центр екрана
                 const posX = event.clientX || window.innerWidth / 2;
                 const posY = event.clientY || window.innerHeight / 2;
                 
@@ -436,7 +777,6 @@
             }
         }
 
-        // Копіювання адреси в буфер
         function copyAddress() {
             const addressText = "Дитячий розважальний центр Країна Мрій, вулиця Легоцького, 19А, Ужгород";
             const tempInput = document.createElement("input");
@@ -446,12 +786,9 @@
             document.execCommand("copy");
             document.body.removeChild(tempInput);
 
-            const toast = document.getElementById("toast");
-            toast.style.opacity = "1";
-            setTimeout(() => toast.style.opacity = "0", 2500);
+            showToast("Адресу скопійовано в буфер обміну!");
         }
 
-        // Підтвердження RSVP форми
         function submitRSVP(event) {
             event.preventDefault();
             document.getElementById("rsvpForm").style.display = 'none';
@@ -460,3 +797,4 @@
     </script>
 </body>
 </html>
+
